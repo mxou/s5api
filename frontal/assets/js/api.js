@@ -141,7 +141,7 @@ displayCategories(data) {
     </ul>
   `;
   this._dom.appContent.innerHTML = htmlCateg;
-  this._dom.backButton.style.display = "block"; 
+  this._dom.backButton.style.display = "flex"; 
   this._state.currentPage = "categories";
 
   // Ajouter un gestionnaire d'événements à chaque catégorie
@@ -162,14 +162,15 @@ displayTricksByCategory(tricks) {
             <h2 class="text-center">${trick.nom}</h2>
             <p class="text-end m-0">${trick.description}</p>
             <p class="text-end m-0">${trick.niveau}</p>
-             <button class="delete_tricks_btn" data-id="${trick.id}">X</button>
+             <button class="delete_tricks_btn" data-id="${trick.id}"><img src="./../assets/icons/trash.svg" alt="Icon bouton suppr">
+             </button>
           </div>
         </div>
   `).join("");
 
   this._dom.appContent.innerHTML = htmlTricks;
-  this._dom.backButton.style.display = "block"; 
-  this._dom.addTricksButton.style.display = "block"; 
+  this._dom.backButton.style.display = "flex"; 
+  this._dom.addTricksButton.style.display = "flex"; 
   this._state.currentPage = "tricks";
   
   this.initializeDeleteButtons(); 
@@ -221,7 +222,8 @@ async handleAddTrick(event) {
         alert(`Erreur: ${responseData.message}`);
       }
     } catch (jsonError) {
-      // console.error('Erreur lors du traitement de la réponse JSON:', jsonError, 'Réponse du serveur (texte brut):', textResponse)
+      // console.error('Erreur lors du traitement de la réponse JSON:', jsonError)
+      // console.error('Réponse du serveur (texte brut):', textResponse)
       // Si la conversion JSON échoue, il y a un problème avec la réponse du serveur
       let htmlAddTrickResponse = `<h1>${name} ajouté avec succès</h1>`;
       this._dom.appContent.innerHTML = htmlAddTrickResponse;
@@ -278,50 +280,72 @@ addTricksForm() {
 
 
 
-  // Afficher les tricks dans le DOM
-  displayTricks(data) {
-  if (!data) {
+displayTricks(data) {
+  if (!data || !data.tricks || data.tricks.length === 0) {
     console.error('Erreur: Données des tricks non disponibles.');
     return;
   }
 
-  // Affichage des tricks
-  const htmlTricks = data.tricks?.map(trick => `
-    <div class="trick p-2 border" data-id="${trick.id}">
-      <img src="../assets/img/fornaite.jpg" alt="Image de ${trick.nom}">
-      <div>
-        <h2 class="text-center">${trick.nom}</h2>
-        <p class="text-end m-0">${trick.description}</p>
-        <p class="text-end m-0">${trick.niveau}</p>
+  // Variable pour garder la trace de l'index du trick actuellement affiché
+  let currentTrickIndex = -1;
+
+  
+  let point = 0;
+
+  const addPoint = () => {
+    point = point + 1;
+  }
+
+  // Fonction pour afficher un trick aléatoire
+  const showRandomTrick = () => {
+
+    // Sélectionner un index aléatoire
+    const randomIndex = Math.floor(Math.random() * data.tricks.length);
+
+    // S'assurer que l'index ne soit pas le même que le précédent
+    if (randomIndex === currentTrickIndex && data.tricks.length > 1) {
+      return showRandomTrick(); // Récursion pour éviter de répéter le même trick
+    }
+
+    // Mettre à jour l'index du trick actuellement affiché
+    currentTrickIndex = randomIndex;
+
+    // Sélectionner le trick à afficher
+    const trick = data.tricks[randomIndex];
+
+    // Créer le HTML pour ce trick
+    const htmlTrick = `
+      <div class="tricks_roulette" id="trick-${trick.id}" data-id="${trick.id}">
+        <img src="../assets/img/fornaite.jpg" alt="Image de ${trick.nom}">
+        <div>
+          <h2 class="text-center">${trick.nom}</h2>
+          <p class="text-end m-0">${trick.description}</p>
+          <p class="text-end m-0">${trick.niveau}</p>
+        </div>
       </div>
-    </div>
-  `).join("") || '';
+    `;
 
-  // Affichage des grinds
-  const htmlGrinds = data.grinds?.map(grind => `
-    <div class="grind p-2 border" data-id="${grind.id}">
-      <h2 class="text-center">${grind.nom}</h2>
-      <p class="text-end m-0">${grind.description}</p>
-      <p class="text-end m-0">${grind.niveau}</p>
-    </div>
-  `).join("") || '';
+    // Afficher ce trick dans le DOM
+    this._dom.appContent.innerHTML = `<h2>Points : ${point}</h2>${htmlTrick}`;
 
-  // Affichage des slides
-  const htmlSlides = data.slides?.map(slide => `
-    <div class="slide p-2 border" data-id="${slide.id}">
-      <h2 class="text-center">${slide.nom}</h2>
-      <p class="text-end m-0">${slide.description}</p>
-      <p class="text-end m-0">${slide.niveau}</p>
-    </div>
-  `).join("") || '';
+    // Afficher le bouton "Suivant"
+    this._dom.appContent.innerHTML += `<button id="next-trick-button">Suivant</button>`;
 
-  this._dom.appContent.innerHTML = `
-    <h2>Tricks</h2>${htmlTricks}
-    <h2>Grinds</h2>${htmlGrinds}
-    <h2>Slides</h2>${htmlSlides}
-  `;
+    // Ajouter un événement pour changer le trick quand l'utilisateur clique sur "Suivant"
+    document.getElementById("next-trick-button").addEventListener("click", () => {
+    showRandomTrick();
+    addPoint();
+});
+
+  
+  };
+
+  // Afficher un trick aléatoire au début
+  showRandomTrick();
+  addPoint();
 }
-};
+}
+
 
 
 // Initialiser l'application quand le DOM est prêt
