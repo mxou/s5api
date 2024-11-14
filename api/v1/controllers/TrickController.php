@@ -2,7 +2,7 @@
 require_once '../models/TrickModel.php';
 
 class TrickController {
-    private $TrickModel;
+    private $trickModel;
 
     public function __construct($pdo) {
         $this->trickModel = new TrickModel($pdo);  // Utilisation du modèle pour accéder à la base de données
