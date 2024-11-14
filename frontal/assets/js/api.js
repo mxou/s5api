@@ -38,9 +38,8 @@ const App = {
   backButtonHandlers() {
     if (this._state.currentPage === "tricks") {
       this.displayCategories(this._cachedCategories); // Revient aux catégories
-    } else if (this._state.currentPage === "categories") {
+    } else if (this._state.currentPage === "categories" || this._state.currentPage === "roulette") {
       window.location.reload();
-
     }
   },
 
@@ -327,6 +326,12 @@ displayTricks(data) {
 
     // Afficher ce trick dans le DOM
     this._dom.appContent.innerHTML = `<h2>Points : ${point}</h2>${htmlTrick}`;
+
+    // ID de la page 
+    this._state.currentPage = "roulette";
+
+    // Affichage button retour 
+    this._dom.backButton.style.display = "flex"; 
 
     // Afficher le bouton "Suivant"
     this._dom.appContent.innerHTML += `<button id="next-trick-button">Suivant</button>`;
