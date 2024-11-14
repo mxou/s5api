@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Site de Skateboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Style du conteneur */
+      .slider {
+        position: relative;
+        width: 300px;
+        height: 50px;
+        background: #ddd;
+        border-radius: 25px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+      }
+
+      /* Texte */
+      .slider-text {
+        font-size: 18px;
+        color: #555;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+
+      /* Bouton de slide */
+      .slider-button {
+        position: relative;
+        width: 50px;
+        height: 50px;
+        background: #007aff;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: left 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slider">
+      <div class="slider-button" id="sliderButton">Slide</div>
+      <span class="slider-text" id="sliderText">Slide to unlock</span>
+    </div>
+  </body>
+  <script>
+    const sliderButton = document.getElementById("sliderButton");
+    const sliderText = document.getElementById("sliderText");
+    const slider = document.querySelector(".slider");
+
+    let isDragging = false;
+    let startX, initialLeft;
+
+    // Fonction pour démarrer le glissement
+    sliderButton.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      initialLeft = sliderButton.offsetLeft;
+      sliderText.style.opacity = "0";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      let newLeft = initialLeft + (e.clientX - startX);
+      newLeft = Math.max(0, Math.min(newLeft, slider.offsetWidth - sliderButton.offsetWidth));
+      sliderButton.style.left = `${newLeft}px`;
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      // Vérifiez si le bouton est à la fin
+      if (sliderButton.offsetLeft >= slider.offsetWidth - sliderButton.offsetWidth) {
+        alert("Unlocked!");
+        sliderButton.style.left = "0";
+      } else {
+        sliderButton.style.left = "0";
+        sliderText.style.opacity = "1";
+      }
+    });
+  </script>
+</html>
